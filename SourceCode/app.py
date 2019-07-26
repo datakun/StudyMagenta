@@ -3,7 +3,7 @@ from werkzeug import secure_filename
 
 import onsets_frames
 
-MIDI_DIRECTORY = "/mnt/d/wsl/magenta/app"
+MIDI_DIRECTORY = "./"
 
 app = Flask(__name__)
  
@@ -14,10 +14,10 @@ def render_file():
 @app.route('/fileUpload', methods = ['GET', 'POST'])
 def upload_file_and_run_onsets_frames():
     if request.method == 'POST':
-        f = request.files['file']
-        f.save(secure_filename(f.filename))
+        uploaded_file = request.files['file']
+        uploaded_file.save(secure_filename(uploaded_file.filename))
 
-        filename = onsets_frames.inference(f.filename)
+        filename = onsets_frames.inference(uploaded_file.filename)
 
         return send_from_directory(MIDI_DIRECTORY, filename, as_attachment=True)
  

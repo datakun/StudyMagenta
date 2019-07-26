@@ -15,10 +15,7 @@ from magenta.music import midi_io
 from magenta.protobuf import music_pb2
 from magenta.music import sequences_lib
 
-CHECKPOINT_DIR = '/mnt/d/wsl/magenta/content/onsets-frames/train'
-
-## Define model and load checkpoint
-## Only needs to be run once.
+CHECKPOINT_DIR = '../train'
 
 config = configs.CONFIG_MAP['onsets_frames']
 hparams = config.hparams
@@ -54,9 +51,9 @@ def input_fn(params):
 
 
 def inference(filename):
-    f = open(filename, mode='rb')
-    wav_data = f.read()
-    f.close()
+    wav_file = open(filename, mode='rb')
+    wav_data = wav_file.read()
+    wav_file.close()
 
     to_process = []
     print('User uploaded file "{name}" with length {length} bytes'.format(
@@ -93,9 +90,8 @@ def inference(filename):
         onset_predictions=onset_predictions,
         velocity_values=velocity_values)
 
-    s = os.path.splitext(filename)
-    s = os.path.split(s[0])
-    output_filename = s + '.mid'
+    basename = os.path.split(os.path.splitext(filename)[0])[1]
+    output_filename = basename + '.mid'
 
     midi_filename = (output_filename)
     midi_io.sequence_proto_to_midi_file(sequence_prediction, midi_filename)
