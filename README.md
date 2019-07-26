@@ -9,7 +9,7 @@
   - https://magenta.tensorflow.org/onsets-frames 자세한 설명
   - [gsutil](https://cloud.google.com/storage/docs/gsutil_install?hl=ko) 을 이용하여 모델을 다운로드
     ```
-    gsutil -q -m cp -R gs://magentadata/models/onsets_frames_transcription/maestro_checkpoint.zip
+    gsutil -q -m cp -R gs://magentadata/models/onsets_frames_transcription/maestro_checkpoint.zip .
     ```
   - train 디렉터리에 모델을 배치
 - MIDI 파일을 재생할 떄 사용하는 pyfluidsynth 모듈은 Python 3에서 지원하지 않음
