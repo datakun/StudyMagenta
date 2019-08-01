@@ -13,7 +13,7 @@
     ```
   - train 디렉터리에 모델을 배치
 - MIDI 파일을 재생할 떄 사용하는 pyfluidsynth 모듈은 Python 3에서 지원하지 않음
-- 리눅스 개발용 build-essential 설치
+- build-essential, libsndfile1, python-dev 설치
 - Python 모듈 설치
   - tensorflow, magenta, flask
   
