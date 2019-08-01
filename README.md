@@ -5,7 +5,7 @@
 
 ## 준비물
 - Windows에서 WSL을 설치한 뒤, Ubuntu 환경에서 Python 3.6 으로 테스트
-- 학습된 모델 (Onsets and Frames 모델 이용)
+- 모델 Checkpoint 받기 (Onsets and Frames 모델 이용)
   - https://magenta.tensorflow.org/onsets-frames 자세한 설명
   - [gsutil](https://cloud.google.com/storage/docs/gsutil_install?hl=ko) 을 이용하여 모델을 다운로드
     ```
@@ -13,6 +13,7 @@
     ```
   - train 디렉터리에 모델을 배치
 - MIDI 파일을 재생할 떄 사용하는 pyfluidsynth 모듈은 Python 3에서 지원하지 않음
+- 리눅스 개발용 build-essential 설치
 - Python 모듈 설치
   - tensorflow, magenta, flask
   
