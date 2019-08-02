@@ -15,73 +15,73 @@ from magenta.music import midi_io
 from magenta.protobuf import music_pb2
 from magenta.music import sequences_lib
 
+# Checkpoint 경로 설정
 CHECKPOINT_DIR = '../train'
 
+# 하이퍼 파라미터 설정
 config = configs.CONFIG_MAP['onsets_frames']
 hparams = config.hparams
 hparams.use_cudnn = False
 hparams.batch_size = 1
 
+# Placeholder 설정
 examples = tf.placeholder(tf.string, [None])
 
-dataset = data.provide_batch(
-    examples=examples,
-    preprocess_examples=True,
-    params=hparams,
-    is_training=False,
-    shuffle_examples=False,
+# 배치 생성
+dataset = data.provide_batch(examples=examples, preprocess_examples=True,
+    params=hparams, is_training=False, shuffle_examples=False,
     skip_n_initial_records=0)
 
+# Estimator 생성
 estimator = train_util.create_estimator(
     config.model_fn, CHECKPOINT_DIR, hparams)
 
+# Iterator 생성
 iterator = dataset.make_initializable_iterator()
 next_record = iterator.get_next()
 
+# 세션 생성
 sess = tf.Session()
 
-sess.run([
-    tf.initializers.global_variables(),
-    tf.initializers.local_variables()
-])
+# 세션 초기화
+sess.run([tf.initializers.global_variables(), tf.initializers.local_variables()])
 
+# 모델 데이터로 Datasets 만들기
 def input_fn(params):
     del params
     return tf.data.Dataset.from_tensors(sess.run(next_record))
 
 
 def inference(filename):
+    # 오디오 파일(.wav) 읽기
     wav_file = open(filename, mode='rb')
     wav_data = wav_file.read()
     wav_file.close()
+    
+    print('User uploaded file "{name}" with length {length} bytes'.format(name=filename, length=len(wav_data)))
 
+    # 청크로 분할 후 protobufs 포맷으로 데이터 생성
     to_process = []
-    print('User uploaded file "{name}" with length {length} bytes'.format(
-    name=filename, length=len(wav_data)))
     example_list = list(
-    audio_label_data_utils.process_record(
-        wav_data=wav_data,
-        ns=music_pb2.NoteSequence(),
-        example_id=filename,
-        min_length=0,
-        max_length=-1,
-        allow_empty_notesequence=True))
+    audio_label_data_utils.process_record(wav_data=wav_data, ns=music_pb2.NoteSequence(),
+        example_id=filename, min_length=0, max_length=-1, allow_empty_notesequence=True))
+    
+    # Serialize
     to_process.append(example_list[0].SerializeToString())
 
-    print('Processing complete for', filename)
-
+    # 세션 실행
     sess.run(iterator.initializer, {examples: to_process})
 
-    prediction_list = list(
-        estimator.predict(
-            input_fn,
-            yield_single_examples=False))
+    # 예측
+    prediction_list = list(estimator.predict(input_fn, yield_single_examples=False))
     assert len(prediction_list) == 1
 
+    # 예측 결과 데이터 가져오기
     frame_predictions = prediction_list[0]['frame_predictions'][0]
     onset_predictions = prediction_list[0]['onset_predictions'][0]
     velocity_values = prediction_list[0]['velocity_values'][0]
 
+    # 예측 결과 데이터를 이용해서 미디 시퀀스 생성
     sequence_prediction = sequences_lib.pianoroll_to_note_sequence(
         frame_predictions,
         frames_per_second=data.hparams_frames_per_second(hparams),
@@ -93,6 +93,7 @@ def inference(filename):
     basename = os.path.split(os.path.splitext(filename)[0])[1]
     output_filename = basename + '.mid'
 
+    # 미디 시퀀스를 파일로 내보내기
     midi_filename = (output_filename)
     midi_io.sequence_proto_to_midi_file(sequence_prediction, midi_filename)
 
