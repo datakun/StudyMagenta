@@ -1,0 +1,4 @@
+import os
+
+WAVE_DIRECTORY = ''
+MIDI_DIRECTORY = ''

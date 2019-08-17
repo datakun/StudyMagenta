@@ -15,6 +15,8 @@ from magenta.music import midi_io
 from magenta.protobuf import music_pb2
 from magenta.music import sequences_lib
 
+import environment as env
+
 # Checkpoint 경로 설정
 CHECKPOINT_DIR = '../train'
 
@@ -90,11 +92,11 @@ def inference(filename):
         onset_predictions=onset_predictions,
         velocity_values=velocity_values)
 
-    basename = os.path.split(os.path.splitext(filename)[0])[1]
-    output_filename = basename + '.mid'
+    basename = os.path.split(os.path.splitext(filename)[0])[1] + '.mid'
+    output_filename = os.path.join(env.MIDI_DIRECTORY, basename)
 
     # 미디 시퀀스를 파일로 내보내기
     midi_filename = (output_filename)
     midi_io.sequence_proto_to_midi_file(sequence_prediction, midi_filename)
 
-    return output_filename
+    return basename
